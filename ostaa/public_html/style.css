@@ -1,0 +1,28 @@
+/*
+CSS for main page
+*/
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+label {
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+input {
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+button {
+  display: block;
+}
