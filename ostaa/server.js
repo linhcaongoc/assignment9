@@ -130,7 +130,7 @@ app.post('/add/item/:username', async (req, res) => {
     const item = new Item({ title, description, image, price, stat });
     try {
         const savedItem = await item.save({});
-        User.findOneAndUpdate(
+        await User.findOneAndUpdate(
             { username },
             { $push: { listings: savedItem._id } },
         );
