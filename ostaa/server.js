@@ -46,86 +46,75 @@ app.use(bodyParser.json());
 app.use(express.static('public_html'));
 
 // handle GET requests to /get/users
-app.get('/get/users', (req, res) => {
+app.get('/get/users', async (req, res) => {
     // find all users in mongodb and return as JSON
-    User.find({}, (err, messages) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.json(messages);
-        }
-    });
+    try {
+        const users = await User.find({});
+        res.json(users);
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
 
 // handle GET requests to /get/items
-app.get('/get/items', (req, res) => {
+app.get('/get/items', async (req, res) => {
     // find all items in mongodb and return as JSON
-    Item.find({}, (err, messages) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.json(messages);
-        }
-    });
+    try {
+        const items = await Item.find({});
+        res.json(items);
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
 
 // handle GET requests to /get/listings/USERNAME
-app.get('/get/listings/:username', (req, res) => {
+app.get('/get/listings/:username', async (req, res) => {
     const username = req.params.username;
-    User.findOne({ username })
-        .populate('listings')
-        .exec((err, user) => {
-            if (err) {
-                res.status(500).send(err);
-            } else {
-                res.json(user.listings);
-            }
-        });
+    try {
+        const user = await User.findOne({ username }).populate('listings');
+        res.json(user.listings);
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
 
 // handle GET requests to /get/purchases/USERNAME
-app.get('/get/purchases/:username', (req, res) => {
+app.get('/get/purchases/:username', async (req, res) => {
     const username = req.params.username;
-    User.findOne({ username })
-        .populate('purchases')
-        .exec((err, user) => {
-            if (err) {
-                res.status(500).send(err);
-            } else {
-                res.json(user.purchases);
-            }
-        });
+    try {
+        const user = await User.findOne({ username }).populate('purchases');
+        res.json(user.purchases);
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
 
 // handle GET requests to /search/users/KEYWORD
-app.get('/search/users/:keyword', (req, res) => {
+app.get('/search/users/:keyword', async (req, res) => {
     const keyword = req.params.keyword;
-    User.find({ username: { $regex: keyword, $options: 'i' } }, (err, users) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.json(users);
-        }
-    });
+    try {
+        const users = await User.find({ username: { $regex: keyword, $options: 'i' } });
+        res.json(users);
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
 
 // handle GET requests to /search/items/KEYWORD
-app.get('/search/items/:keyword', (req, res) => {
+app.get('/search/items/:keyword', async (req, res) => {
     const keyword = req.params.keyword;
-    Item.find({ description: { $regex: keyword, $options: 'i' } }, (err, items) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.json(items);
-        }
-    });
+    try {
+        const items = await Item.find({ description: { $regex: keyword, $options: 'i' } });
+        res.json(items);
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
 
 // handle POST requests to /add/user
 app.post('/add/user', async (req, res) => {
     const { username, password } = req.body;
     const user = new User({ username, password });
-
     try {
         await user.save({});
         res.send('User added successfully');
@@ -139,7 +128,6 @@ app.post('/add/item/:username', async (req, res) => {
     const { title, description, image, price, stat } = req.body;
     const username = req.params.username;
     const item = new Item({ title, description, image, price, stat });
-
     try {
         const savedItem = await item.save({});
         User.findOneAndUpdate(
