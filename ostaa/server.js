@@ -122,40 +122,34 @@ app.get('/search/items/:keyword', (req, res) => {
 });
 
 // handle POST requests to /add/user
-app.post('/add/user', (req, res) => {
+app.post('/add/user', async (req, res) => {
     const { username, password } = req.body;
     const user = new User({ username, password });
-    user.save({}, (err) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.send('User added successfully');
-        }
-    });
+
+    try {
+        await user.save({});
+        res.send('User added successfully');
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
 
 // handle POST requests to /add/item/USERNAME
-app.post('/add/item/:username', (req, res) => {
+app.post('/add/item/:username', async (req, res) => {
     const { title, description, image, price, stat } = req.body;
     const username = req.params.username;
     const item = new Item({ title, description, image, price, stat });
-    item.save({}, (err, savedItem) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            User.findOneAndUpdate(
-                { username },
-                { $push: { listings: savedItem._id } },
-                (err) => {
-                    if (err) {
-                        res.status(500).send(err);
-                    } else {
-                        res.send('Item added successfully');
-                    }
-                }
-            );
-        }
-    });
+
+    try {
+        const savedItem = await item.save({});
+        User.findOneAndUpdate(
+            { username },
+            { $push: { listings: savedItem._id } },
+        );
+        res.send('Item added successfully');
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
 
 // start server
