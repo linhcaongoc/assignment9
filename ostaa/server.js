@@ -125,7 +125,7 @@ app.get('/search/items/:keyword', (req, res) => {
 app.post('/add/user', (req, res) => {
     const { username, password } = req.body;
     const user = new User({ username, password });
-    user.save((err) => {
+    user.save({}, (err) => {
         if (err) {
             res.status(500).send(err);
         } else {
@@ -139,7 +139,7 @@ app.post('/add/item/:username', (req, res) => {
     const { title, description, image, price, stat } = req.body;
     const username = req.params.username;
     const item = new Item({ title, description, image, price, stat });
-    item.save((err, savedItem) => {
+    item.save({}, (err, savedItem) => {
         if (err) {
             res.status(500).send(err);
         } else {
